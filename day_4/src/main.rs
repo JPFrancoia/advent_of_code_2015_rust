@@ -22,7 +22,7 @@ fn main() {
             //break
         //}
 
-        if digest.starts_with("00000") {
+        if digest.starts_with("000000") {
             println!("{}", digest);
             counter = n;
             break
