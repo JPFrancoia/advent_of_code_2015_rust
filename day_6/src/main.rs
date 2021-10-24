@@ -1,10 +1,9 @@
-use std::fs;
-
+use std::{fs, cmp};
 
 fn main() {
     let contents = fs::read_to_string("input.txt").unwrap();
 
-    let mut grid: [[bool; 1000]; 1000] = [[false; 1000]; 1000];
+    let mut grid: [[i32; 1000]; 1000] = [[0; 1000]; 1000];
 
     for line in contents.lines() {
         let t = Transformation::from_line(line).unwrap();
@@ -13,13 +12,11 @@ fn main() {
         for row_idx in t.top_left_row..=t.bot_right_row {
             for col_idx in t.top_left_col..=t.bot_right_col {
                 //println!("{:?}", grid[0][0]);
-                //row_idx as usize;
-                //col_idx as usize
-                let cell: &mut bool = &mut grid[row_idx as usize][col_idx as usize];
+                let cell: &mut i32 = &mut grid[row_idx as usize][col_idx as usize];
                 match t.transform_type {
-                    TransformationType::On => {*cell = true},
-                    TransformationType::Off => {*cell = false},
-                    TransformationType::Toggle => {*cell = !*cell},
+                    TransformationType::On => *cell += 1,
+                    TransformationType::Off => *cell = cmp::max(0, *cell - 1),
+                    TransformationType::Toggle => *cell += 2,
                 }
             }
         }
@@ -29,15 +26,10 @@ fn main() {
 
     for row in grid.iter() {
         for col in row.iter() {
-
-            match col {
-                true => count += 1,
-                _ => (),
-            }
-
+            count += col;
         }
     }
-    println!("Total lights on: {}", count);
+    println!("Total brightness: {}", count);
 }
 
 #[derive(Debug)]
