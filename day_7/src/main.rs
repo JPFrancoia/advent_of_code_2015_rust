@@ -8,14 +8,14 @@ fn main() {
     let contents = fs::read_to_string("input.txt").unwrap();
     //let contents = fs::read_to_string("example.txt").unwrap();
 
-    //let test: u16 = 42;
-    //println!("{:016b}", test);
-    //println!("{:016b}", !test);
-
-    let op = Operation::COMPUTED(23, "ab".to_string());
-
     let mut map_values: HashMap<String, u16> = HashMap::new();
     let mut unprocessed_ops: VecDeque<Operation> = VecDeque::new();
+
+    // Comment to get answer for part 1
+    map_values.insert(String::from("b"), 46065);
+
+    //46065 part 1
+    //14134 too high
 
     for line in contents.lines() {
         let data: Vec<&str> = line.split(' ').collect();
@@ -28,7 +28,7 @@ fn main() {
 
         match process_operation(&op, &map_values) {
             Ok((val, output)) => {
-                map_values.insert(output, val);
+                map_values.entry(output).or_insert(val);
             },
             Err(_) => unprocessed_ops.push_back(op),
         }
@@ -42,14 +42,10 @@ fn main() {
 
         match process_operation(&op, &map_values) {
             Ok((val, output)) => {
-                map_values.insert(output, val);
+                map_values.entry(output).or_insert(val);
             },
             Err(_) => unprocessed_ops.push_back(op),
         }
-
-        //println!("{:?}", unprocessed_ops);
-        //println!("{:?}", map_values);
-
     }
 
     println!("Unprocessed ops: {}", unprocessed_ops.len());
