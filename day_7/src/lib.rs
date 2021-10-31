@@ -132,8 +132,3 @@ pub fn get_value_if_computed(
 // ap LSHIFT 1 -> bj
 // dh AND dj -> dk
 // et RSHIFT 5 -> ew
-//
-
-//fn create_node(data: Vec<&str>) -> Node {
-//if data.len() == 3 {}
-//}
