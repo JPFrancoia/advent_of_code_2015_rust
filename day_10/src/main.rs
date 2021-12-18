@@ -10,7 +10,6 @@ fn main() {
 }
 
 fn look_and_say(input: &str) -> String {
-
     let mut output = String::new();
 
     // NOTE: we're not handling the case where input is empty
