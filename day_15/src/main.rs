@@ -1,22 +1,61 @@
 use counter::Counter;
 use std::collections::{HashMap, VecDeque};
-use std::fs;
+use std::{fs, cmp};
 
 fn main() {
-    println!("Hello, world!");
 
     let contents = fs::read_to_string("input.txt").unwrap();
     // let contents = fs::read_to_string("example.txt").unwrap();
     let spoons = 100;
+    let max_cals = 500;
 
     let ingredients: Vec<Ingredient> = contents
         .lines()
         .map(|line| Ingredient::from_line(line))
         .collect();
 
-    let best_score = find_best_cookie_bfs_memoized(ingredients, spoons);
+    // 21367368
+    // let best_score = find_best_cookie_bfs_memoized(ingredients, spoons);
+
+    // For part B
+    // 1766400
+    let best_score = find_best_cookie_brute_force(ingredients, spoons, max_cals);
 
     println!("Best score: {:?}", best_score);
+}
+
+
+fn find_best_cookie_brute_force(ingredients: Vec<Ingredient>, spoons: u32, max_cals: u32) -> u32 {
+
+    let mut best_score = 0;
+
+    for idx_first_ing in 0..spoons{
+        for idx_second_ing in 0..spoons-idx_first_ing {
+            for idx_third_ing in 0..spoons-idx_first_ing-idx_second_ing {
+
+                let idx_fourth_ing = spoons - idx_first_ing - idx_second_ing - idx_third_ing;
+
+                let mut ing_map: HashMap<&Ingredient, u32> = HashMap::new();
+
+                ing_map.insert(&ingredients[0], idx_first_ing);
+                ing_map.insert(&ingredients[1], idx_second_ing);
+                ing_map.insert(&ingredients[2], idx_third_ing);
+                ing_map.insert(&ingredients[3], idx_fourth_ing);
+
+                let (score, cals) = compute_score_and_cals(ing_map);
+
+                if cals > max_cals {
+                    continue
+                }
+
+                best_score = cmp::max(best_score, score);
+
+            }
+
+        }
+    }
+
+    return best_score
 }
 
 fn find_best_cookie_bfs_memoized(ingredients: Vec<Ingredient>, spoons: u32) -> u32 {
@@ -76,14 +115,14 @@ fn find_best_cookie_bfs_memoized(ingredients: Vec<Ingredient>, spoons: u32) -> u
     return best_node.score();
 }
 
-#[derive(Clone, Debug)]
+#[derive(Clone, Debug, PartialEq, Eq, Hash)]
 struct Ingredient {
     name: String,
     capacity: i32,
     durability: i32,
     flavor: i32,
     texture: i32,
-    calories: i32,
+    calories: u32,
 }
 
 impl Ingredient {
@@ -99,7 +138,7 @@ impl Ingredient {
         let durability: i32 = parse_nbr_str(data[4]);
         let flavor: i32 = parse_nbr_str(data[6]);
         let texture: i32 = parse_nbr_str(data[8]);
-        let calories: i32 = data[10].parse().unwrap();
+        let calories: u32 = data[10].parse().unwrap();
 
         Ingredient {
             name,
@@ -142,5 +181,28 @@ impl<'a> Node<'a> {
         Node {
             ingredients: Vec::new(),
         }
+    }
+}
+
+fn compute_score_and_cals(ingredients_amounts: HashMap<&Ingredient, u32>) -> (u32, u32){
+
+    let mut tot_capacity: i32 = 0;
+    let mut tot_durability: i32 = 0;
+    let mut tot_flavor: i32 = 0;
+    let mut tot_texture: i32 = 0;
+    let mut tot_cals: u32 = 0;
+
+    for (ing, amount) in ingredients_amounts {
+        tot_capacity += ing.capacity * amount as i32;
+        tot_durability += ing.durability * amount as i32;
+        tot_flavor += ing.flavor as i32 * amount as i32;
+        tot_texture += ing.texture as i32 * amount as i32;
+        tot_cals += ing.calories * amount;
+    }
+
+    if tot_capacity <= 0 || tot_durability <= 0 || tot_flavor <= 0 || tot_texture <= 0 {
+        return (0, 0);
+    } else {
+        return ((tot_capacity * tot_durability * tot_flavor * tot_texture) as u32, tot_cals);
     }
 }
