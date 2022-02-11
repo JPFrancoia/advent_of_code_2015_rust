@@ -61,8 +61,6 @@ impl Sue {
             })
             .collect();
 
-        // println!("{:?}\n", items);
-
         Sue {
             id: data[1].trim_end_matches(":").parse().unwrap(),
             children: items.get("children").cloned(),
@@ -93,7 +91,7 @@ impl PartialEq for Sue {
         }
 
         let go = match (self.cats, other.cats) {
-            (Some(val1), Some(val2)) => val1 == val2,
+            (Some(val1), Some(val2)) => val1 > val2,
             _ => true,
         };
         if go == false {
@@ -109,7 +107,7 @@ impl PartialEq for Sue {
         }
 
         let go = match (self.pomeranians, other.pomeranians) {
-            (Some(val1), Some(val2)) => val1 == val2,
+            (Some(val1), Some(val2)) => val1 < val2,
             _ => true,
         };
         if go == false {
@@ -133,7 +131,7 @@ impl PartialEq for Sue {
         }
 
         let go = match (self.goldfish, other.goldfish) {
-            (Some(val1), Some(val2)) => val1 == val2,
+            (Some(val1), Some(val2)) => val1 < val2,
             _ => true,
         };
         if go == false {
@@ -141,7 +139,7 @@ impl PartialEq for Sue {
         }
 
         let go = match (self.trees, other.trees) {
-            (Some(val1), Some(val2)) => val1 == val2,
+            (Some(val1), Some(val2)) => val1 > val2,
             _ => true,
         };
         if go == false {
